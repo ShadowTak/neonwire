@@ -43,7 +43,7 @@ VERCEL_TOKEN=<วาง token ที่นี่> npm run deploy
 
 | ขั้น | สิ่งที่ทำ |
 | --- | --- |
-| 1 | ตรวจ config: token, `.env` ครบ 3 ตัว, `JWT_SECRET` ≥ 32 ตัวอักษร, มี `vercel.json` / `api/index.js` / `dist/` |
+| 1 | ตรวจ config: token, `.env` ครบ 3 ตัว, `JWT_SECRET` ≥ 32 ตัวอักษร, มี `vercel.json` / `api/index.js`, และ **`.vercelignore` ต้องกัน `.env` ไว้** (ถ้าไม่ จะปฏิเสธการ deploy) |
 | 2 | สร้าง global-config ชั่วคราวใน tmp → **ไม่แตะ auth.json ของ root** |
 | 3 | `vercel project create` + `vercel link` (สร้างโปรเจกต์ถ้ายังไม่มี) |
 | 4 | ตั้ง env 3 ตัวลง **production + preview** (`env add --value --force`) |
@@ -81,6 +81,7 @@ npm run cleanup:test                      # ลบข้อมูลทดสอ
 ## 🛡️ สิ่งที่ต้องไม่พลาด
 
 - [ ] `.env` **ห้าม** ขึ้น GitHub — ตรวจแล้วว่าไม่ขึ้น (`.gitignore` กันไว้)
+- [ ] `.env` **ห้าม** ถูกอัปโหลดตอน deploy — Vercel CLI ไม่อ่าน `.gitignore` ต้องมี `.vercelignore` (มีให้แล้ว และสคริปต์ deploy จะปฏิเสธถ้าไฟล์นี้หาย)
 - [ ] อย่าตั้ง `TURSO_DATABASE_URL=file:./local.db` บน Vercel — ระบบไฟล์ serverless ไม่ถาวร
 - [ ] `JWT_SECRET` ต้องเหมือนเดิมทุก deploy ไม่งั้นผู้ใช้เดิมจะถูก logout ทั้งหมด
 - [ ] `TURSO_AUTH_TOKEN` และ `JWT_SECRET` ห้ามโผล่ในไฟล์ Vue หรือตัวแปร `VITE_*`

@@ -92,6 +92,11 @@ JWT_SECRET=your-random-secret-at-least-32-chars
 > ⚠️ ห้ามใช้ `file:./local.db` บน Vercel — ระบบไฟล์ของ serverless ไม่ถาวร
 > และห้าม commit token หรือ `JWT_SECRET` ลง repository
 
+> 🔐 **สำคัญ:** Vercel CLI **ไม่อ่าน `.gitignore`** — มันอัปโหลดทุกไฟล์ในโปรเจกต์
+> ยกเว้นที่ระบุไว้ใน **`.vercelignore`** โปรเจกต์นี้มี `.vercelignore` กัน `.env`,
+> `*.db`, `dist/` และ `output/` ไว้แล้ว ถ้าเพิ่มไฟล์ลับใหม่ต้องเพิ่มในไฟล์นี้ด้วย
+> สคริปต์ `npm run deploy` จะ **ปฏิเสธการ deploy** ถ้า `.vercelignore` หายหรือไม่ได้กัน `.env`
+
 ### 3.1 ทางลัด: deploy อัตโนมัติ
 
 ถ้าไม่อยากกดทีละขั้น ให้ใช้สคริปต์ที่ทำทุกอย่างให้เอง:
@@ -202,6 +207,9 @@ npm run cleanup:test   # ลบบัญชีทดสอบออกจาก�
 ---
 
 ## 7. หมายเหตุด้านความปลอดภัย
+
+`.env` ถูกกันไว้ 2 ชั้น: `.gitignore` (สำหรับ push ขึ้น GitHub) และ `.vercelignore`
+(สำหรับ `vercel deploy` ซึ่งไม่อ่าน `.gitignore`)
 
 โปรเจกต์นี้เก็บ JWT ใน `localStorage` เพื่อให้เรียนรู้ได้ง่าย ระบบ production
 ที่มีผู้ใช้จริงควรย้ายไปใช้ HttpOnly + Secure + SameSite cookie พร้อม CSRF

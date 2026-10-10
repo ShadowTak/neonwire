@@ -97,6 +97,26 @@ for (const entry of ['vercel.json', 'api/index.js', 'server/app.js']) {
 }
 good('vercel.json, api/index.js and server/app.js are present')
 
+// The Vercel CLI does NOT read .gitignore — anything not listed in
+// .vercelignore gets uploaded, which would leak .env straight to Vercel.
+const ignoreFile = path.join(root, '.vercelignore')
+if (!existsSync(ignoreFile)) {
+  die(
+    '.vercelignore is missing. The Vercel CLI does not read .gitignore, so .env\n' +
+      '  (with your Turso token and JWT_SECRET) would be uploaded. Refusing to deploy.',
+  )
+}
+const patterns = readFileSync(ignoreFile, 'utf8')
+  .split('\n')
+  .map((line) => line.trim())
+  .filter((line) => line && !line.startsWith('#'))
+if (!patterns.some((p) => p === '.env' || p === '.env*' || p === '.env.*')) {
+  die('.vercelignore does not exclude .env — your Turso token would be uploaded. Refusing to deploy.')
+}
+good('.vercelignore excludes .env (secrets stay local)')
+if (patterns.includes('dist')) good('.vercelignore excludes dist/ (Vercel builds fresh)')
+else note('dist/ is not in .vercelignore — Vercel may serve your local build instead of rebuilding')
+
 // Vercel builds the frontend remotely, so a local dist/ is not required;
 // it only matters for running the bundled app locally with `npm start`.
 if (existsSync(path.join(root, 'dist'))) good('local dist/ present')

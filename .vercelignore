@@ -1,0 +1,24 @@
+# IMPORTANT: the Vercel CLI does NOT read .gitignore.
+# Everything here would otherwise be uploaded to Vercel with `vercel deploy`.
+
+# Secrets — must never leave this machine
+.env
+.env.*
+local.db
+local.db-journal
+local.db-wal
+local.db-shm
+*.db
+*.db-*
+
+# Let Vercel build the frontend itself. Uploading a local dist/ can make the
+# deployment silently serve a stale build.
+dist
+
+# Local-only artifacts
+node_modules
+output
+todo.md
+.vercel
+.DS_Store
+*.log
