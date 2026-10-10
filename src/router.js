@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { auth } from './store.js'
 
 const routes = [
-  { path: '/auth', name: 'auth', component: () => import('./views/AuthView.vue'), meta: { public: true } },
+  { path: '/auth', alias: '/login', name: 'auth', component: () => import('./views/AuthView.vue'), meta: { public: true } },
   { path: '/', name: 'feed', component: () => import('./views/FeedView.vue') },
   { path: '/explore', name: 'explore', component: () => import('./views/ExploreView.vue') },
   { path: '/me', name: 'me', component: () => import('./views/ProfileView.vue') },
