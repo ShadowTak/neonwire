@@ -1,0 +1,36 @@
+{
+  "name": "social-app",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -n api,web -c magenta,cyan \"npm:dev:api\" \"npm:dev:web\"",
+    "dev:api": "node --watch server/local.js",
+    "dev:web": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "start": "node server/local.js",
+    "check": "node scripts/check.js",
+    "test:smoke": "node scripts/smoke.js"
+  },
+  "dependencies": {
+    "@libsql/client": "^0.15.4",
+    "bcryptjs": "^3.0.2",
+    "drizzle-orm": "^0.44.2",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.8",
+    "concurrently": "^9.1.2",
+    "vite": "^7.1.5",
+    "vue": "^3.5.40",
+    "vue-router": "^4.5.1"
+  },
+  "engines": {
+    "node": "^22.18.0 || >=24.12.0"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true
+  }
+}
