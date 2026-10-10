@@ -12,6 +12,6 @@
       "destination": "/api/index.js"
     }
   ],
-  "buildCommand": "mkdir -p public && echo API > public/index.html",
+  "buildCommand": "mkdir -p public && echo ok > public/placeholder.txt",
   "outputDirectory": "public"
 }
