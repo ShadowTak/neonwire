@@ -10,7 +10,7 @@ function collect(dir, out = []) {
   for (const entry of readdirSync(dir)) {
     const full = path.join(dir, entry)
     if (statSync(full).isDirectory()) collect(full, out)
-    else if (entry.endsWith('.js')) out.push(full)
+    else if (/\.m?js$/.test(entry)) out.push(full)
   }
   return out
 }
@@ -29,5 +29,10 @@ for (const dir of targets) {
   }
 }
 
-console.log(failed === 0 ? '\n✅ syntax check passed\n' : `\n❌ ${failed} file(s) failed\n`)
+const total = targets.reduce((sum, dir) => sum + collect(path.join(root, dir)).length, 0)
+console.log(
+  failed === 0
+    ? `\n✅ syntax check passed (${total} files)\n`
+    : `\n❌ ${failed} of ${total} file(s) failed\n`,
+)
 process.exit(failed === 0 ? 0 : 1)

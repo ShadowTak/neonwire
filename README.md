@@ -92,6 +92,32 @@ JWT_SECRET=your-random-secret-at-least-32-chars
 > ⚠️ ห้ามใช้ `file:./local.db` บน Vercel — ระบบไฟล์ของ serverless ไม่ถาวร
 > และห้าม commit token หรือ `JWT_SECRET` ลง repository
 
+### 3.1 ทางลัด: deploy อัตโนมัติ
+
+ถ้าไม่อยากกดทีละขั้น ให้ใช้สคริปต์ที่ทำทุกอย่างให้เอง:
+
+```bash
+# 1. สร้าง token ที่ https://vercel.com/account/tokens
+# 2. รันคำสั่งเดียว
+VERCEL_TOKEN=xxxxx npm run deploy
+```
+
+`scripts/deploy.mjs` จะ:
+1. ตรวจ config (token, `.env` 3 ตัว, `JWT_SECRET` ≥ 32 ตัวอักษร, ไฟล์ที่ต้องมี)
+2. สร้าง global-config ชั่วคราว → ไม่แตะ `auth.json` ของเครื่อง
+3. สร้างโปรเจกต์ (ถ้ายังไม่มี) + link
+4. ตั้ง env 3 ตัวลง production **และ** preview
+5. `vercel deploy --prod`
+6. ตรวจของจริง: `/api/health`, หน้า SPA, deep link, ไฟล์ใน `/assets`, 404 ของ API
+7. รัน smoke test 29 ข้อกับ URL จริง
+8. ลบข้อมูลทดสอบออกจากฐานข้อมูลให้เอง
+
+ตัวเลือก: `--project <name>`, `--team <id>`, `--no-verify`, `--token <value>`
+
+ลบข้อมูลทดสอบด้วยมือ: `npm run cleanup:test`
+
+ดูรายละเอียดทั้งหมดใน [`todo.md`](./todo.md)
+
 ---
 
 ## 4. API Endpoints
@@ -140,8 +166,11 @@ social-app/
 │   ├── router.js         # Vue Router + auth guard
 │   └── style.css         # ระบบดีไซน์ cyberpunk
 ├── scripts/
-│   ├── check.js          # ตรวจ syntax
-│   └── smoke.js          # ทดสอบ API แบบ end-to-end
+│   ├── check.js               # ตรวจ syntax
+│   ├── smoke.js               # ทดสอบ API แบบ end-to-end
+│   ├── deploy.mjs             # deploy Vercel อัตโนมัติ + ตรวจผล
+│   └── cleanup-test-data.mjs  # ลบข้อมูลทดสอบจากฐานข้อมูล
+├── todo.md               # สถานะงาน + ขั้นที่เหลือ
 ├── output/               # ภาพหน้าจอจากการทดสอบ UI
 ├── .env.example
 └── vercel.json
@@ -152,10 +181,12 @@ social-app/
 ## 6. ตรวจงานก่อนส่ง
 
 ```bash
-npm run check     # ตรวจ syntax ฝั่ง server
-npm run build     # build frontend
-npm run dev:api   # เปิด API (อีก terminal)
-npm run test:smoke
+npm run check          # ตรวจ syntax ฝั่ง server + scripts
+npm run build          # build frontend
+npm run dev:api        # เปิด API (อีก terminal)
+npm run test:smoke     # ยิงเข้า http://localhost:3000
+npm run deploy         # deploy ขึ้น Vercel + ตรวจให้อัตโนมัติ
+npm run cleanup:test   # ลบบัญชีทดสอบออกจากฐานข้อมูล
 ```
 
 `npm run test:smoke` จะสร้างบัญชีทดสอบ 2 บัญชี และตรวจสอบ
