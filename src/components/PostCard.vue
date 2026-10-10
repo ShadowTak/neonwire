@@ -108,24 +108,24 @@ async function removePost() {
 </script>
 
 <template>
-  <article class="panel post">
+  <article class="card post">
     <header class="post-head">
       <UserAvatar :name="post.author.username" :accent="post.author.accent" />
-      <div style="flex: 1; min-width: 0">
-        <RouterLink class="post-author" :to="{ name: 'user', params: { id: post.author.id } }">
+      <div class="post-id">
+        <RouterLink class="post-name" :to="{ name: 'user', params: { id: post.author.id } }">
           {{ post.author.username }}
         </RouterLink>
-        <div class="comment-meta">
-          <span class="mono dim">{{ timeAgo(post.createdAt) }}</span>
-          <span v-if="wasEdited" class="badge-edit">แก้ไขแล้ว</span>
+        <div class="post-meta">
+          <span>{{ timeAgo(post.createdAt) }}</span>
+          <span v-if="wasEdited" class="tag">แก้ไขแล้ว</span>
+          <span v-if="isMine" class="tag">ของคุณ</span>
         </div>
       </div>
-      <span v-if="isMine" class="mono dim">// ของฉัน</span>
     </header>
 
     <template v-if="editing">
       <textarea v-model="draft" class="textarea" maxlength="500" rows="4" />
-      <div class="composer-head" style="margin-top: 12px">
+      <div class="composer-foot" style="margin-top: 12px; border-top: none; padding-top: 0">
         <span class="counter" :class="{ over: draft.length > 500 }">{{ draft.length }}/500</span>
         <span style="display: flex; gap: 8px">
           <button class="btn btn-ghost btn-sm" type="button" @click="editing = false">ยกเลิก</button>
@@ -138,8 +138,8 @@ async function removePost() {
 
     <p v-else class="post-body">{{ post.content }}</p>
 
-    <div v-if="!editing" class="post-actions">
-      <button class="act" :class="{ liked: post.likedByMe }" type="button" :disabled="busy === 'like'" @click="toggleLike">
+    <footer v-if="!editing" class="post-foot">
+      <button class="act" :class="{ on: post.likedByMe }" type="button" :disabled="busy === 'like'" @click="toggleLike">
         <span>{{ post.likedByMe ? '♥' : '♡' }}</span>
         <span>{{ compact(post.likeCount) }}</span>
       </button>
@@ -149,13 +149,13 @@ async function removePost() {
         <span>{{ compact(post.commentCount) }}</span>
       </button>
 
-      <span style="flex: 1" />
+      <span class="spacer" />
 
       <template v-if="isMine">
         <template v-if="confirmingDelete">
-          <span class="mono dim">ลบเลยไหม?</span>
+          <span class="muted" style="font-size: 13px">ลบโพสต์นี้?</span>
           <button class="btn btn-danger btn-sm" type="button" :disabled="busy === 'delete'" @click="removePost">
-            {{ busy === 'delete' ? '…' : 'ยืนยัน' }}
+            {{ busy === 'delete' ? '…' : 'ลบ' }}
           </button>
           <button class="btn btn-ghost btn-sm" type="button" @click="confirmingDelete = false">ไม่</button>
         </template>
@@ -164,49 +164,46 @@ async function removePost() {
           <button class="btn btn-ghost btn-sm" type="button" @click="confirmingDelete = true">ลบ</button>
         </template>
       </template>
-    </div>
+    </footer>
 
     <section v-if="open && !editing" class="thread">
-      <div v-if="!post.comments.length" class="mono dim" style="padding: 4px 0">
-        ยังไม่มีความคิดเห็น — เป็นคนแรกสิ
-      </div>
+      <p v-if="!post.comments.length" class="thread-empty">ยังไม่มีความคิดเห็น เป็นคนแรกเลย</p>
 
       <div v-for="item in post.comments" :key="item.id" class="comment">
         <UserAvatar :name="item.author.username" :accent="item.author.accent" size="sm" />
         <div class="comment-body">
-          <div style="display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap">
-            <RouterLink class="post-author" style="font-size: 13px" :to="{ name: 'user', params: { id: item.author.id } }">
+          <div class="comment-top">
+            <RouterLink class="post-name" :to="{ name: 'user', params: { id: item.author.id } }">
               {{ item.author.username }}
             </RouterLink>
-            <span class="mono dim">{{ timeAgo(item.createdAt) }}</span>
+            <span class="muted">{{ timeAgo(item.createdAt) }}</span>
             <button
               v-if="auth.user?.id === item.author.id"
-              class="icon-btn"
+              class="link-btn"
               type="button"
-              title="ลบความคิดเห็น"
               :disabled="busy === `comment-${item.id}`"
               @click="removeComment(item.id)"
             >
-              ✕
+              ลบ
             </button>
           </div>
           <p class="comment-text">{{ item.content }}</p>
         </div>
       </div>
 
-      <div class="comment-form">
+      <form class="comment-form" @submit.prevent="submitComment">
         <input
           v-model="commentDraft"
           class="input"
           type="text"
           maxlength="300"
-          placeholder="แสดงความคิดเห็น…"
-          @keyup.enter="submitComment"
+          placeholder="เขียนความคิดเห็น…"
+          aria-label="เขียนความคิดเห็น"
         />
-        <button class="btn btn-sm" type="button" :disabled="!commentDraft.trim() || busy === 'comment'" @click="submitComment">
+        <button class="btn btn-sm" type="submit" :disabled="!commentDraft.trim() || busy === 'comment'">
           {{ busy === 'comment' ? '…' : 'ส่ง' }}
         </button>
-      </div>
+      </form>
     </section>
   </article>
 </template>

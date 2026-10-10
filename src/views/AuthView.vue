@@ -13,10 +13,9 @@ const error = ref('')
 const form = reactive({ username: '', email: '', password: '' })
 
 const points = [
-  'สมัครด้วยอีเมล ใช้เวลาไม่ถึงนาที',
-  'สร้าง แก้ไข และลบโพสต์ของตัวเอง',
-  'กด Like และแสดงความคิดเห็นแบบเรียลไทม์',
-  'โปรไฟล์สาธารณะพร้อมสถิติของตัวเอง',
+  'สร้าง แก้ไข และลบโพสต์ของตัวเองได้ทุกเมื่อ',
+  'กดใจและแสดงความคิดเห็นใต้โพสต์ของผู้อื่น',
+  'ค้นหาคนและเรื่องที่สนใจจากหน้าสำรวจ',
 ]
 
 const canSubmit = computed(() => {
@@ -38,7 +37,7 @@ async function submit() {
   try {
     if (mode.value === 'register') {
       await register({ email: form.email.trim(), password: form.password, username: form.username.trim() })
-      toast.ok('ยินดีต้อนรับเข้าสู่ Pulse')
+      toast.ok('ยินดีต้อนรับเข้าสู่ Orbit')
     } else {
       await login(form.email.trim(), form.password)
       toast.ok('เข้าสู่ระบบสำเร็จ')
@@ -54,51 +53,41 @@ async function submit() {
 
 <template>
   <div class="auth">
-    <section class="auth-hero">
+    <section class="auth-intro">
+      <RouterLink class="brand" :to="{ name: 'feed' }">
+        <span class="brand-mark">◎</span>
+        <span>Orbit</span>
+      </RouterLink>
+
       <div>
-        <div class="logo">
-          <span class="logo-mark">⚡</span>
-          <span>
-            <span class="logo-text">Pulse</span>
-            <span class="logo-sub">// social grid</span>
-          </span>
-        </div>
-
-        <h1>ส่ง<br /><em>สัญญาณ</em><br />ของคุณ</h1>
-
-        <p class="muted" style="max-width: 44ch">
-          เครือข่ายสังคมสไตล์ cyberpunk — แชร์ความคิด กด Like และพูดคุยกับผู้คนบนกริดเดียวกัน
-        </p>
-
-        <div class="hero-points">
-          <div v-for="(point, index) in points" :key="point" class="hero-point">
-            <span>[{{ String(index + 1).padStart(2, '0') }}]</span>
-            {{ point }}
-          </div>
-        </div>
+        <h1 class="auth-headline">เล่าเรื่อง<br />ของคุณ<em>ให้โลกฟัง</em></h1>
+        <p class="auth-lead">พื้นที่เล็ก ๆ สำหรับความคิดและบทสนทนาดี ๆ แชร์สิ่งที่คุณกำลังคิด แล้วพูดคุยกับคนที่สนใจเรื่องเดียวกัน</p>
       </div>
 
-      <div class="mono dim">Vue 3 · Express 5 · Drizzle · Turso</div>
+      <ul class="auth-list">
+        <li v-for="point in points" :key="point">{{ point }}</li>
+      </ul>
     </section>
 
     <section class="auth-panel">
-      <div class="panel panel-hot auth-card">
-        <div class="tabs" role="tablist">
+      <div class="card auth-card">
+        <h2>{{ mode === 'register' ? 'สร้างบัญชีใหม่' : 'ยินดีต้อนรับกลับ' }}</h2>
+        <p class="muted">{{ mode === 'register' ? 'ใช้เวลาไม่ถึงนาที' : 'เข้าสู่ระบบเพื่อดูฟีดของคุณ' }}</p>
+
+        <div class="segmented" role="tablist">
           <button
-            class="tab"
-            :class="{ active: mode === 'login' }"
             type="button"
             role="tab"
+            :class="{ on: mode === 'login' }"
             :aria-selected="mode === 'login'"
             @click="switchMode('login')"
           >
             เข้าสู่ระบบ
           </button>
           <button
-            class="tab"
-            :class="{ active: mode === 'register' }"
             type="button"
             role="tab"
+            :class="{ on: mode === 'register' }"
             :aria-selected="mode === 'register'"
             @click="switchMode('register')"
           >
@@ -115,7 +104,7 @@ async function submit() {
               class="input"
               type="text"
               autocomplete="username"
-              placeholder="เช่น neonrider"
+              placeholder="เช่น mintwrites"
               maxlength="30"
             />
           </div>
@@ -144,15 +133,15 @@ async function submit() {
             />
           </div>
 
-          <p v-if="error" class="error-text">{{ error }}</p>
+          <p v-if="error" class="error">{{ error }}</p>
 
           <button class="btn btn-primary btn-block" type="submit" :disabled="!canSubmit">
             {{ busy ? 'กำลังเชื่อมต่อ…' : mode === 'register' ? 'สร้างบัญชี' : 'เข้าสู่ระบบ' }}
           </button>
 
-          <p class="hint" style="text-align: center">
+          <p class="auth-switch">
             {{ mode === 'register' ? 'มีบัญชีอยู่แล้ว?' : 'ยังไม่มีบัญชี?' }}
-            <a href="#" class="neon" @click.prevent="switchMode(mode === 'register' ? 'login' : 'register')">
+            <a href="#" @click.prevent="switchMode(mode === 'register' ? 'login' : 'register')">
               {{ mode === 'register' ? 'เข้าสู่ระบบ' : 'สมัครฟรี' }}
             </a>
           </p>

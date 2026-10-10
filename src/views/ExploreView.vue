@@ -55,25 +55,26 @@ watch(
 </script>
 
 <template>
-  <AppShell title="// สำรวจ">
-    <section class="panel panel-pad">
-      <div class="composer-head">
-        <span class="kicker">// ค้นหาบนกริด</span>
-        <span class="mono dim">{{ term ? `ผลลัพธ์สำหรับ "${term}"` : 'แสดงโพสต์ล่าสุดทั้งหมด' }}</span>
-      </div>
-      <form @submit.prevent="run(term.trim())">
-        <input v-model="term" class="input" type="search" placeholder="พิมพ์คำที่ต้องการค้นหาแล้วกด Enter…" />
-      </form>
-    </section>
+  <AppShell title="สำรวจ">
+    <form class="card card-pad search-panel" role="search" @submit.prevent="run(term.trim())">
+      <input
+        v-model="term"
+        class="input"
+        type="search"
+        placeholder="ค้นหาโพสต์หรือชื่อผู้ใช้…"
+        aria-label="คำค้นหา"
+      />
+      <p class="hint">{{ term ? `ผลลัพธ์สำหรับ “${term}”` : 'แสดงโพสต์ล่าสุดทั้งหมด' }}</p>
+    </form>
 
     <template v-if="loading">
       <div v-for="n in 3" :key="n" class="skeleton" />
     </template>
 
     <template v-else>
-      <section v-if="users.length" class="panel panel-pad">
-        <div class="kicker" style="margin-bottom: 12px">// ผู้ใช้ที่พบ ({{ users.length }})</div>
-        <div style="display: flex; flex-direction: column; gap: 8px">
+      <section v-if="users.length" class="card card-pad">
+        <div class="section-label">ผู้ใช้ที่พบ {{ users.length }} คน</div>
+        <div class="user-list">
           <RouterLink
             v-for="user in users"
             :key="user.id"
@@ -81,17 +82,17 @@ watch(
             :to="{ name: 'user', params: { id: user.id } }"
           >
             <UserAvatar :name="user.username" :accent="user.accent" size="sm" />
-            <div style="flex: 1; min-width: 0">
-              <div class="post-author">{{ user.username }}</div>
-              <div class="mono dim" style="font-size: 10px">{{ user.bio || 'ยังไม่มี bio' }}</div>
+            <div>
+              <div class="post-name">{{ user.username }}</div>
+              <div class="user-row-bio">{{ user.bio || 'ยังไม่มีแนะนำตัว' }}</div>
             </div>
-            <span class="mono dim">→</span>
+            <span class="muted">→</span>
           </RouterLink>
         </div>
       </section>
 
       <template v-if="posts.length">
-        <div class="kicker">// โพสต์ที่พบ ({{ compact(posts.length) }})</div>
+        <div class="section-label">โพสต์ที่พบ {{ compact(posts.length) }} รายการ</div>
         <PostCard
           v-for="post in posts"
           :key="post.id"
@@ -101,9 +102,9 @@ watch(
         />
       </template>
 
-      <div v-else-if="searched" class="panel empty">
-        <div class="empty-mark">∅</div>
-        <p class="title">ไม่พบผลลัพธ์</p>
+      <div v-else-if="searched" class="card empty">
+        <div class="empty-glyph">∅</div>
+        <p class="empty-title">ไม่พบผลลัพธ์</p>
         <p class="muted">ลองใช้คำค้นอื่น หรือกลับไปดูฟีดรวม</p>
       </div>
     </template>

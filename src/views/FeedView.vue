@@ -54,32 +54,34 @@ onMounted(load)
 </script>
 
 <template>
-  <AppShell :title="`// ${headline}`">
+  <AppShell :title="headline">
     <PostComposer @created="onCreated" />
 
-    <div class="preset-row">
+    <div class="chips" role="group" aria-label="เลือกฟีด">
       <button
         v-for="item in scopes"
         :key="item.value"
         class="chip"
-        :class="{ active: scope === item.value }"
+        :class="{ on: scope === item.value }"
         type="button"
+        :aria-pressed="scope === item.value"
         @click="setScope(item.value)"
       >
         {{ item.label }}
       </button>
-      <button class="chip" type="button" @click="load">↻ รีเฟรช</button>
+      <span class="spacer" />
+      <button class="chip" type="button" @click="load">รีเฟรช</button>
     </div>
 
     <template v-if="loading">
       <div v-for="n in 3" :key="n" class="skeleton" />
     </template>
 
-    <div v-else-if="!posts.length" class="panel empty">
-      <div class="empty-mark">▓▒░</div>
-      <p class="title">ยังไม่มีสัญญาณ</p>
+    <div v-else-if="!posts.length" class="card empty">
+      <div class="empty-glyph">◌</div>
+      <p class="empty-title">ยังไม่มีโพสต์</p>
       <p class="muted">
-        {{ scope === 'mine' ? 'คุณยังไม่ได้โพสต์อะไร ลองพิมพ์ด้านบนดูสิ' : 'ยังไม่มีโพสต์ในระบบ เริ่มเป็นคนแรกเลย' }}
+        {{ scope === 'mine' ? 'คุณยังไม่ได้โพสต์อะไร เริ่มจากกล่องด้านบนได้เลย' : 'ยังไม่มีโพสต์ในระบบ เป็นคนแรกที่เริ่มต้น' }}
       </p>
     </div>
 

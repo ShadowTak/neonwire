@@ -23,7 +23,7 @@ const form = reactive({ username: '', bio: '', accent: 'cyan' })
 
 const targetId = computed(() => (route.name === 'me' ? auth.user?.id : Number(route.params.id)))
 const isMe = computed(() => Boolean(auth.user && targetId.value === auth.user.id))
-const title = computed(() => (isMe.value ? '// โปรไฟล์ของฉัน' : `// @${profile.value?.username ?? '…'}`))
+const title = computed(() => (isMe.value ? 'โปรไฟล์ของฉัน' : profile.value?.username ?? 'โปรไฟล์'))
 
 const dirty = computed(() => {
   if (!profile.value) return false
@@ -111,76 +111,74 @@ watch(() => route.params.id, load)
 
 <template>
   <AppShell :title="title">
-    <div v-if="loading" class="skeleton" style="height: 190px" />
+    <div v-if="loading" class="skeleton" style="height: 220px" />
 
-    <div v-else-if="!profile" class="panel empty">
-      <div class="empty-mark">✕</div>
-      <p class="title">ไม่พบผู้ใช้</p>
+    <div v-else-if="!profile" class="card empty">
+      <div class="empty-glyph">✕</div>
+      <p class="empty-title">ไม่พบผู้ใช้</p>
       <p class="muted">บัญชีนี้อาจถูกลบไปแล้ว</p>
     </div>
 
     <template v-else>
-      <section class="panel panel-hot profile-banner">
+      <section class="card profile">
         <div class="profile-top">
           <UserAvatar :name="profile.username" :accent="profile.accent" size="lg" />
-          <div style="flex: 1; min-width: 180px">
-            <div class="kicker">{{ isMe ? '// บัญชีของคุณ' : '// โปรไฟล์สาธารณะ' }}</div>
-            <h2 class="title">{{ profile.username }}</h2>
-            <p class="muted" style="margin-top: 6px">{{ profile.bio || 'ยังไม่มี bio — เขียนแนะนำตัวสั้น ๆ ได้' }}</p>
-            <p v-if="isMe" class="mono dim" style="margin-top: 8px">{{ profile.email }}</p>
+          <div class="profile-info">
+            <h2 class="profile-name">{{ profile.username }}</h2>
+            <p class="profile-bio">{{ profile.bio || (isMe ? 'ยังไม่มีแนะนำตัว ลองเขียนสักประโยคสิ' : 'ผู้ใช้รายนี้ยังไม่ได้แนะนำตัว') }}</p>
+            <p v-if="isMe" class="profile-mail">{{ profile.email }}</p>
           </div>
           <button v-if="isMe && !editing" class="btn btn-sm" type="button" @click="startEdit">แก้ไขโปรไฟล์</button>
         </div>
 
         <div class="profile-stats">
-          <div class="stat">
+          <div>
             <b>{{ compact(stats.posts) }}</b>
-            <span class="kicker">โพสต์</span>
+            <span>โพสต์</span>
           </div>
-          <div class="stat">
+          <div>
             <b>{{ compact(stats.likes) }}</b>
-            <span class="kicker">ไลก์ที่ได้รับ</span>
+            <span>ไลก์ที่ได้รับ</span>
           </div>
-          <div class="stat">
+          <div>
             <b>{{ compact(posts.reduce((sum, item) => sum + item.commentCount, 0)) }}</b>
-            <span class="kicker">ความคิดเห็น</span>
+            <span>ความคิดเห็น</span>
           </div>
         </div>
 
-        <form v-if="editing" class="form-stack" @submit.prevent="save">
+        <form v-if="editing" class="form-stack" style="margin-top: 22px" @submit.prevent="save">
           <div class="field">
             <label for="p-name">ชื่อผู้ใช้</label>
             <input id="p-name" v-model="form.username" class="input" maxlength="30" />
           </div>
 
           <div class="field">
-            <label for="p-bio">bio</label>
-            <textarea id="p-bio" v-model="form.bio" class="textarea" maxlength="200" rows="2" placeholder="แนะนำตัวสั้น ๆ…" />
+            <label for="p-bio">แนะนำตัว</label>
+            <textarea id="p-bio" v-model="form.bio" class="textarea" maxlength="200" rows="2" placeholder="เล่าสั้น ๆ เกี่ยวกับตัวคุณ…" />
             <span class="hint">{{ form.bio.length }}/200</span>
           </div>
 
           <div class="field">
-            <label>สีโปรไฟล์</label>
-            <div class="preset-row">
+            <span class="label">สีประจำตัว</span>
+            <div class="swatches">
               <button
                 v-for="color in ACCENTS"
                 :key="color"
                 class="swatch"
-                :class="[`accent-${color}`, { active: form.accent === color }]"
+                :class="[`accent-${color}`, { on: form.accent === color }]"
                 type="button"
                 :title="color"
                 :aria-label="color"
+                :aria-pressed="form.accent === color"
                 @click="form.accent = color"
-              >
-                <i />
-              </button>
+              />
             </div>
           </div>
 
-          <div style="display: flex; gap: 9px; justify-content: flex-end">
+          <div style="display: flex; gap: 8px; justify-content: flex-end">
             <button class="btn btn-ghost btn-sm" type="button" @click="editing = false">ยกเลิก</button>
             <button class="btn btn-primary btn-sm" type="submit" :disabled="!dirty || saving">
-              {{ saving ? 'กำลังบันทึก…' : 'บันทึกโปรไฟล์' }}
+              {{ saving ? 'กำลังบันทึก…' : 'บันทึก' }}
             </button>
           </div>
         </form>
@@ -188,12 +186,12 @@ watch(() => route.params.id, load)
 
       <PostComposer v-if="isMe" @created="onCreated" />
 
-      <div class="kicker">{{ isMe ? '// โพสต์ของฉัน' : `// โพสต์ของ @${profile.username}` }}</div>
+      <div class="section-label">{{ isMe ? 'โพสต์ของคุณ' : `โพสต์ของ ${profile.username}` }}</div>
 
-      <div v-if="!posts.length" class="panel empty">
-        <div class="empty-mark">▓▒░</div>
-        <p class="title">ยังไม่มีโพสต์</p>
-        <p class="muted">{{ isMe ? 'เริ่มโพสต์แรกของคุณด้านบน' : 'ผู้ใช้รายนี้ยังไม่โพสต์อะไร' }}</p>
+      <div v-if="!posts.length" class="card empty">
+        <div class="empty-glyph">◌</div>
+        <p class="empty-title">ยังไม่มีโพสต์</p>
+        <p class="muted">{{ isMe ? 'เริ่มโพสต์แรกของคุณจากกล่องด้านบน' : 'ผู้ใช้รายนี้ยังไม่ได้โพสต์อะไร' }}</p>
       </div>
 
       <template v-else>

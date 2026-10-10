@@ -5,7 +5,7 @@ import UserAvatar from './UserAvatar.vue'
 import { auth, logout } from '../store.js'
 import { compact } from '../utils.js'
 
-defineProps({ title: { type: String, default: '' } })
+defineProps({ title: { type: String, default: 'ฟีด' } })
 
 const route = useRoute()
 const router = useRouter()
@@ -19,9 +19,9 @@ watch(
 )
 
 const nav = [
-  { to: { name: 'feed' }, icon: '⚡', label: 'ฟีด' },
-  { to: { name: 'explore' }, icon: '🛰', label: 'สำรวจ' },
-  { to: { name: 'me' }, icon: '◉', label: 'โปรไฟล์' },
+  { to: { name: 'feed' }, icon: '◐', label: 'ฟีด' },
+  { to: { name: 'explore' }, icon: '◌', label: 'สำรวจ' },
+  { to: { name: 'me' }, icon: '○', label: 'โปรไฟล์' },
 ]
 
 function search() {
@@ -36,51 +36,48 @@ function signOut() {
 </script>
 
 <template>
-  <div class="shell">
-    <aside class="sidebar">
-      <RouterLink class="logo" :to="{ name: 'feed' }">
-        <span class="logo-mark">⚡</span>
-        <span>
-          <span class="logo-text">Pulse</span>
-          <span class="logo-sub">// social grid</span>
-        </span>
+  <div class="app">
+    <aside class="side">
+      <RouterLink class="brand" :to="{ name: 'feed' }">
+        <span class="brand-mark">◎</span>
+        <span>Orbit</span>
       </RouterLink>
 
       <nav class="nav">
-        <RouterLink v-for="item in nav" :key="item.label" class="nav-item" :to="item.to">
+        <RouterLink v-for="item in nav" :key="item.label" class="nav-link" :to="item.to">
           <span class="nav-icon">{{ item.icon }}</span>
           <span>{{ item.label }}</span>
         </RouterLink>
       </nav>
 
-      <div class="sidebar-foot">
-        <div class="stat-grid">
-          <div class="stat">
+      <div class="side-foot">
+        <div class="stats-inline">
+          <div>
             <b>{{ compact(auth.stats?.posts) }}</b>
-            <span class="kicker">โพสต์</span>
+            โพสต์
           </div>
-          <div class="stat">
+          <div>
             <b>{{ compact(auth.stats?.likes) }}</b>
-            <span class="kicker">ไลก์</span>
+            ไลก์
           </div>
         </div>
 
-        <div class="me-card">
+        <div class="me">
           <UserAvatar :name="auth.user?.username" :accent="auth.user?.accent" size="sm" />
-          <div style="flex: 1; min-width: 0">
+          <div class="me-meta">
             <div class="me-name">{{ auth.user?.username }}</div>
-            <div class="mono dim" style="font-size: 9px">{{ auth.user?.email }}</div>
+            <div class="me-mail">{{ auth.user?.email }}</div>
           </div>
         </div>
 
-        <button class="btn btn-ghost btn-sm btn-block" type="button" @click="signOut">ออกจากระบบ</button>
+        <button class="btn btn-ghost btn-sm" type="button" @click="signOut">ออกจากระบบ</button>
       </div>
     </aside>
 
     <div class="main">
       <header class="topbar">
-        <span class="topbar-title">{{ title || '// pulse' }}</span>
-        <form class="search" @submit.prevent="search">
+        <span class="topbar-title">{{ title }}</span>
+        <form class="search" role="search" @submit.prevent="search">
           <input v-model="term" class="input" type="search" placeholder="ค้นหาโพสต์…" aria-label="ค้นหาโพสต์" />
         </form>
       </header>
@@ -91,14 +88,14 @@ function signOut() {
     </div>
   </div>
 
-  <nav class="tabbar">
+  <nav class="tabbar" aria-label="เมนูหลัก">
     <RouterLink v-for="item in nav" :key="item.label" :to="item.to">
       <i>{{ item.icon }}</i>
       <span>{{ item.label }}</span>
     </RouterLink>
-    <a href="#" @click.prevent="signOut">
-      <i>⏻</i>
+    <button type="button" @click="signOut">
+      <i>⎋</i>
       <span>ออก</span>
-    </a>
+    </button>
   </nav>
 </template>

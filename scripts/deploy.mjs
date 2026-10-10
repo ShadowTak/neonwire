@@ -32,7 +32,7 @@ const value = (name) => {
   return i >= 0 ? argv[i + 1] : undefined
 }
 
-const PROJECT = value('--project') || process.env.VERCEL_PROJECT || 'pulse-social'
+const PROJECT = value('--project') || process.env.VERCEL_PROJECT || 'orbit-social-app'
 const verify = !flag('--no-verify')
 const REQUIRED = ['TURSO_DATABASE_URL', 'TURSO_AUTH_TOKEN', 'JWT_SECRET']
 const TARGETS = ['production', 'preview']

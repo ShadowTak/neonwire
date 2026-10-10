@@ -31,32 +31,27 @@ async function submit() {
 </script>
 
 <template>
-  <section class="panel panel-pad" aria-label="สร้างโพสต์">
-    <div class="composer-head">
-      <span class="kicker">// broadcast</span>
-      <span class="counter" :class="{ warn: draft.length > 430 && draft.length <= MAX, over: draft.length > MAX }">
-        {{ draft.length }}/{{ MAX }}
-      </span>
-    </div>
-
-    <div class="composer-row">
-      <UserAvatar :name="auth.user?.username" :accent="auth.user?.accent" />
+  <section class="card composer" aria-label="สร้างโพสต์">
+    <UserAvatar :name="auth.user?.username" :accent="auth.user?.accent" />
+    <div class="composer-body">
       <textarea
         v-model="draft"
         class="textarea"
         rows="3"
         :maxlength="MAX"
-        placeholder="กำลังคิดอะไรอยู่… พิมพ์สัญญาณของคุณที่นี่"
+        placeholder="วันนี้มีอะไรอยากบอกคนอื่นบ้าง…"
+        aria-label="เนื้อหาโพสต์"
         @keydown.ctrl.enter="submit"
         @keydown.meta.enter="submit"
       />
-    </div>
-
-    <div class="composer-head" style="margin: 12px 0 0">
-      <span class="hint">Ctrl + Enter เพื่อโพสต์</span>
-      <button class="btn btn-primary btn-sm" type="button" :disabled="!draft.trim() || busy" @click="submit">
-        {{ busy ? 'กำลังส่ง…' : 'โพสต์' }}
-      </button>
+      <div class="composer-foot">
+        <span class="counter" :class="{ warn: draft.length > 430 && draft.length <= MAX, over: draft.length > MAX }">
+          {{ draft.length }}/{{ MAX }}
+        </span>
+        <button class="btn btn-primary btn-sm" type="button" :disabled="!draft.trim() || busy" @click="submit">
+          {{ busy ? 'กำลังส่ง…' : 'โพสต์' }}
+        </button>
+      </div>
     </div>
   </section>
 </template>
