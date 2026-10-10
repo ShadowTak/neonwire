@@ -18,6 +18,21 @@ const app = express()
 app.disable('x-powered-by')
 app.use(express.json({ limit: '32kb' }))
 
+// The frontend may be served from another origin (split deployment). Only
+// origins listed in CORS_ORIGIN (comma-separated) get cross-origin access.
+const allowedOrigins = (process.env.CORS_ORIGIN ?? '').split(',').map((o) => o.trim()).filter(Boolean)
+app.use((req, res, next) => {
+  const origin = req.headers.origin
+  if (origin && allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin)
+    res.setHeader('Vary', 'Origin')
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE, OPTIONS')
+  }
+  if (req.method === 'OPTIONS') return res.sendStatus(204)
+  next()
+})
+
 /* ---------------------------------------------------------------- helpers */
 
 const wrap = (handler) => (req, res, next) => Promise.resolve(handler(req, res, next)).catch(next)
@@ -150,6 +165,11 @@ async function loadPost(postId, viewerId = null) {
 }
 
 /* ------------------------------------------------------------------ routes */
+
+app.get(
+  '/',
+  (_req, res) => res.json({ name: 'orbit-api', status: 'ok', health: '/api/health' }),
+)
 
 app.get(
   '/api/health',

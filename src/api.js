@@ -3,14 +3,17 @@ export function setUnauthorizedHandler(fn) {
   handleUnauthorized = fn
 }
 
+// Empty for same-origin (dev proxy / single deployment); set VITE_API_BASE to
+// the backend origin when the API is deployed separately.
+const API_BASE = import.meta.env.VITE_API_BASE ?? ''
+
 /**
- * Thin fetch wrapper. Always talks to `/api/*` so the same code works with the
- * Vite dev proxy, a single-origin deployment, and Vercel.
+ * Thin fetch wrapper. Talks to `/api/*` on the API origin.
  */
 export async function request(path, { method = 'GET', body, token } = {}) {
   let res
   try {
-    res = await fetch(`/api${path}`, {
+    res = await fetch(`${API_BASE}/api${path}`, {
       method,
       headers: {
         ...(body !== undefined ? { 'Content-Type': 'application/json' } : {}),
