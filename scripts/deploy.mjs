@@ -92,10 +92,15 @@ const team = value('--team') || process.env.VERCEL_TEAM || detectTeam()
 if (team) good(`team scope: ${team}`)
 else note('no team detected — using the token default scope')
 
-for (const entry of ['vercel.json', 'api/index.js', 'dist']) {
-  if (!existsSync(path.join(root, entry))) die(`${entry} not found — run from the project root`)
+for (const entry of ['vercel.json', 'api/index.js', 'server/app.js']) {
+  if (!existsSync(path.join(root, entry))) die(`${entry} not found — run this from the project root`)
 }
-good('vercel.json, api/index.js and dist/ are present')
+good('vercel.json, api/index.js and server/app.js are present')
+
+// Vercel builds the frontend remotely, so a local dist/ is not required;
+// it only matters for running the bundled app locally with `npm start`.
+if (existsSync(path.join(root, 'dist'))) good('local dist/ present')
+else note('dist/ not built locally — Vercel will build it (run `npm run build` only for local `npm start`)')
 
 /* ------------------------------------------------------------ 2. CLI setup */
 
