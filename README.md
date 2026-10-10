@@ -1,5 +1,3 @@
-# ⚡ PULSE — Social Network (Final Project)
-
 เว็บไซต์ Social Media แบบ Full-stack ธีม **cyberpunk / dark neon**
 Stack: **Vue 3 (Vite) + Express 5 + Drizzle ORM + Turso (libSQL) + Vercel**
 
